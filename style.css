@@ -1,0 +1,602 @@
+/* ============================================================
+   ATLAS — design tokens
+   Ink-navy base, brass/gold accent, region wayfinding colors.
+   ============================================================ */
+:root {
+  --bg: #0b1220;
+  --surface: #121a2b;
+  --surface-2: #17203a;
+  --border: #24304d;
+  --border-soft: #1b2438;
+
+  --text: #eaedf4;
+  --text-muted: #8b96b0;
+  --text-faint: #5c6883;
+
+  --gold: #c9a227;
+  --gold-soft: rgba(201, 162, 39, 0.14);
+  --coral: #e2685a;
+  --coral-soft: rgba(226, 104, 90, 0.14);
+
+  /* region wayfinding palette */
+  --region-africa: #d98e4a;
+  --region-americas: #4fb0a5;
+  --region-asia: #c9a227;
+  --region-europe: #7c93c9;
+  --region-oceania: #8fbf6b;
+  --region-antarctic: #9c8cc7;
+  --region-default: #7c8aa8;
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  --radius-card: 10px;
+  --radius-pill: 999px;
+  --shadow-card: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Reset & base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--gold);
+}
+
+/* Cartographic latitude/longitude grid, faint, fixed behind everything */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(201, 162, 39, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 162, 39, 0.055) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 0%, transparent 75%);
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(11, 18, 32, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wordmark-icon {
+  display: inline-flex;
+  color: var(--gold);
+  transform: translateY(1px);
+}
+
+.wordmark h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 1.6rem;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.tagline {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: var(--font-mono);
+}
+
+.meta-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+}
+
+.meta-value {
+  font-size: 0.95rem;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Controls (search + region filter)
+   ============================================================ */
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 28px 64px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0 16px;
+  height: 46px;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.control:focus-within {
+  border-color: var(--gold);
+  background: var(--surface-2);
+}
+
+.control-icon {
+  flex: none;
+  color: var(--text-faint);
+}
+
+.search-control {
+  flex: 1 1 320px;
+  min-width: 220px;
+}
+
+.search-control input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.search-control input::placeholder {
+  color: var(--text-faint);
+}
+
+.select-control {
+  flex: 0 0 auto;
+  min-width: 200px;
+  position: relative;
+}
+
+.select-control select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.92rem;
+  flex: 1;
+  padding-right: 4px;
+  cursor: pointer;
+}
+
+.select-control select option {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.chevron-icon {
+  flex: none;
+  color: var(--text-faint);
+}
+
+/* ============================================================
+   Results / grid
+   ============================================================ */
+.results {
+  position: relative;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* ---- Card ---- */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: card-in 0.42s var(--ease) forwards;
+  transition: border-color 0.18s var(--ease), transform 0.18s var(--ease);
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+}
+
+@keyframes card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* stamp-perforation seam between flag and body */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  top: 132px;
+  width: 16px;
+  height: 16px;
+  background: var(--bg);
+  border-radius: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.card::before {
+  left: -8px;
+}
+
+.card::after {
+  right: -8px;
+}
+
+.card-flag {
+  height: 132px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.flag-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 20px 18px 18px;
+  border-top: 1px dashed var(--border);
+}
+
+.card-name {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.08rem;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.5em;
+}
+
+.card-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.82rem;
+}
+
+.meta-row dt {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex: none;
+}
+
+.meta-row dd {
+  margin: 0;
+  text-align: right;
+  color: var(--text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pop-value,
+.capital-value {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.region-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.region-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--region-default);
+}
+
+.region-value {
+  font-size: 0.8rem;
+}
+
+/* region color coding */
+.region-dot.r-africa { background: var(--region-africa); }
+.region-dot.r-americas { background: var(--region-americas); }
+.region-dot.r-asia { background: var(--region-asia); }
+.region-dot.r-europe { background: var(--region-europe); }
+.region-dot.r-oceania { background: var(--region-oceania); }
+.region-dot.r-antarctic { background: var(--region-antarctic); }
+
+/* ============================================================
+   Skeleton loading state
+   ============================================================ */
+.skeleton-grid[hidden],
+.grid#countryGrid[hidden] {
+  display: none;
+}
+
+.card.skeleton {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.skel-flag {
+  height: 132px;
+  background: linear-gradient(100deg, var(--surface-2) 30%, #1f2946 45%, var(--surface-2) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skel-body {
+  padding: 20px 18px 18px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skel-line {
+  height: 11px;
+  border-radius: 5px;
+  background: linear-gradient(100deg, var(--surface-2) 30%, #1f2946 45%, var(--surface-2) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skel-line.w60 { width: 60%; height: 15px; margin-bottom: 4px; }
+.skel-line.w40 { width: 40%; }
+.skel-line.w50 { width: 50%; }
+.skel-line.w35 { width: 35%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   Empty / error state panels
+   ============================================================ */
+.state-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 90px 20px;
+  color: var(--text-muted);
+}
+
+.state-panel svg {
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+#errorState svg {
+  color: var(--coral);
+}
+
+.state-panel h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.state-panel p {
+  margin: 0;
+  max-width: 360px;
+  font-size: 0.88rem;
+}
+
+.btn {
+  margin-top: 10px;
+  background: var(--gold-soft);
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.btn:hover {
+  background: rgba(201, 162, 39, 0.24);
+  transform: translateY(-1px);
+}
+
+#errorState .btn {
+  background: var(--coral-soft);
+  border-color: rgba(226, 104, 90, 0.4);
+  color: var(--coral);
+}
+
+#errorState .btn:hover {
+  background: rgba(226, 104, 90, 0.24);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.site-footer {
+  text-align: center;
+  padding: 28px 20px 40px;
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 720px) {
+  .header-inner {
+    padding: 18px 20px;
+  }
+
+  .tagline {
+    display: none;
+  }
+
+  main {
+    padding: 22px 18px 48px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .search-control,
+  .select-control {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
+
+  .skel-flag,
+  .skel-line {
+    animation: none;
+    background: var(--surface-2);
+  }
+
+  .btn:hover {
+    transform: none;
+  }
+}
