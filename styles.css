@@ -474,6 +474,9 @@ main {
   padding: 90px 20px;
   color: var(--text-muted);
 }
+.state-panel[hidden] {
+  display: none !important;
+}
 
 .state-panel svg {
   color: var(--text-faint);
