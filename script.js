@@ -2,11 +2,10 @@
 
 /* ============================================================
    Atlas — country explorer
-   Vanilla JS, no dependencies. Fetches the REST Countries API,
-   renders a card grid, and supports live search + region filter.
    ============================================================ */
 
-const API_URL = "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
+// Using a highly reliable, pre-encoded CORS proxy that bypasses adblockers
+const API_URL = "https://api.allorigins.win/raw?url=https%3A%2F%2Frestcountries.com%2Fv3.1%2Fall%3Ffields%3Dname%2Cflags%2Cpopulation%2Cregion%2Ccapital%2Ccca3";
 
 const REGION_LABELS = {
   africa: "Africa",
@@ -38,13 +37,12 @@ const retryBtn = document.getElementById("retryBtn");
 const cardTemplate = document.getElementById("cardTemplate");
 
 // ---- State ---------------------------------------------------------------
-let allCountries = []; // full dataset from the API, sorted by name
+let allCountries = [];
 let searchTerm = "";
 let selectedRegion = "all";
 
 // ---- Utilities -------------------------------------------------------
 
-/** Debounce: waits for a pause in typing before invoking fn. */
 function debounce(fn, delay = 250) {
   let timer;
   return (...args) => {
@@ -53,15 +51,11 @@ function debounce(fn, delay = 250) {
   };
 }
 
-/** Turns "Latin America" -> "latin-america" style slugs for CSS classes. */
 function regionSlug(region) {
-  return String(region || "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-");
+  return String(region || "").toLowerCase().trim().replace(/\s+/g, "-");
 }
 
-// ---- View state switches (Updated to direct style.display) -------------
+// ---- View state switches (Bulletproof Cache Fix) -------------
 
 function setBusy(isBusy) {
   resultsSection.setAttribute("aria-busy", String(isBusy));
@@ -69,37 +63,37 @@ function setBusy(isBusy) {
 
 function showSkeleton() {
   setBusy(true);
-  skeletonGrid.style.display = "grid";
-  countryGrid.style.display = "none";
-  emptyState.style.display = "none";
-  errorState.style.display = "none";
+  skeletonGrid.hidden = false; skeletonGrid.style.display = "grid";
+  countryGrid.hidden = true; countryGrid.style.display = "none";
+  emptyState.hidden = true; emptyState.style.display = "none";
+  errorState.hidden = true; errorState.style.display = "none";
 }
 
 function showGrid() {
   setBusy(false);
-  skeletonGrid.style.display = "none";
-  countryGrid.style.display = "grid";
-  emptyState.style.display = "none";
-  errorState.style.display = "none";
+  skeletonGrid.hidden = true; skeletonGrid.style.display = "none";
+  countryGrid.hidden = false; countryGrid.style.display = "grid";
+  emptyState.hidden = true; emptyState.style.display = "none";
+  errorState.hidden = true; errorState.style.display = "none";
 }
 
 function showEmpty(title, message) {
   setBusy(false);
-  skeletonGrid.style.display = "none";
-  countryGrid.style.display = "none";
-  errorState.style.display = "none";
+  skeletonGrid.hidden = true; skeletonGrid.style.display = "none";
+  countryGrid.hidden = true; countryGrid.style.display = "none";
+  errorState.hidden = true; errorState.style.display = "none";
   emptyTitle.textContent = title;
   emptyMessage.textContent = message;
-  emptyState.style.display = "flex";
+  emptyState.hidden = false; emptyState.style.display = "flex";
 }
 
 function showError(message) {
   setBusy(false);
-  skeletonGrid.style.display = "none";
-  countryGrid.style.display = "none";
-  emptyState.style.display = "none";
+  skeletonGrid.hidden = true; skeletonGrid.style.display = "none";
+  countryGrid.hidden = true; countryGrid.style.display = "none";
+  emptyState.hidden = true; emptyState.style.display = "none";
   errorMessage.textContent = message;
-  errorState.style.display = "flex";
+  errorState.hidden = false; errorState.style.display = "flex";
 }
 
 // ---- Rendering -------------------------------------------------------
