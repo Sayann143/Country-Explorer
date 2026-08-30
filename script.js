@@ -6,9 +6,7 @@
    renders a card grid, and supports live search + region filter.
    ============================================================ */
 
-// Only request the fields the UI actually uses — keeps the payload
-// small and avoids the API's 400 response when no fields are given.
-const API_URL = "https://corsproxy.io/?https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
+const API_URL = "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
 
 const REGION_LABELS = {
   africa: "Africa",
@@ -63,7 +61,7 @@ function regionSlug(region) {
     .replace(/\s+/g, "-");
 }
 
-// ---- View state switches -------------------------------------------------
+// ---- View state switches (Updated to direct style.display) -------------
 
 function setBusy(isBusy) {
   resultsSection.setAttribute("aria-busy", String(isBusy));
@@ -71,37 +69,37 @@ function setBusy(isBusy) {
 
 function showSkeleton() {
   setBusy(true);
-  skeletonGrid.hidden = false;
-  countryGrid.hidden = true;
-  emptyState.hidden = true;
-  errorState.hidden = true;
+  skeletonGrid.style.display = "grid";
+  countryGrid.style.display = "none";
+  emptyState.style.display = "none";
+  errorState.style.display = "none";
 }
 
 function showGrid() {
   setBusy(false);
-  skeletonGrid.hidden = true;
-  countryGrid.hidden = false;
-  emptyState.hidden = true;
-  errorState.hidden = true;
+  skeletonGrid.style.display = "none";
+  countryGrid.style.display = "grid";
+  emptyState.style.display = "none";
+  errorState.style.display = "none";
 }
 
 function showEmpty(title, message) {
   setBusy(false);
-  skeletonGrid.hidden = true;
-  countryGrid.hidden = true;
-  errorState.hidden = true;
+  skeletonGrid.style.display = "none";
+  countryGrid.style.display = "none";
+  errorState.style.display = "none";
   emptyTitle.textContent = title;
   emptyMessage.textContent = message;
-  emptyState.hidden = false;
+  emptyState.style.display = "flex";
 }
 
 function showError(message) {
   setBusy(false);
-  skeletonGrid.hidden = true;
-  countryGrid.hidden = true;
-  emptyState.hidden = true;
+  skeletonGrid.style.display = "none";
+  countryGrid.style.display = "none";
+  emptyState.style.display = "none";
   errorMessage.textContent = message;
-  errorState.hidden = false;
+  errorState.style.display = "flex";
 }
 
 // ---- Rendering -------------------------------------------------------
@@ -128,8 +126,6 @@ function buildCard(country) {
   img.src = flagSrc;
   img.alt = flagAlt;
   img.onerror = () => {
-    // Fall back to the PNG, and finally to a plain tinted placeholder
-    // if even that fails, so a broken image icon never appears.
     if (img.src !== country.flags?.png && country.flags?.png) {
       img.src = country.flags.png;
     } else {
@@ -260,9 +256,6 @@ async function loadCountries() {
     renderCountries(allCountries);
   } catch (err) {
     console.error("Failed to load countries:", err);
-    // Checking `err.name` (rather than `instanceof TypeError`) avoids
-    // false negatives across realms/polyfills — a plain network failure
-    // from fetch() surfaces as a TypeError named "TypeError".
     const isNetworkFailure = err?.name === "TypeError";
     const message = isNetworkFailure
       ? "We couldn't reach the REST Countries API. Check your internet connection and try again."
