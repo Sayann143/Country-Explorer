@@ -8,8 +8,7 @@
 
 // Only request the fields the UI actually uses — keeps the payload
 // small and avoids the API's 400 response when no fields are given.
-const API_URL =
-  "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
+const API_URL = "https://corsproxy.io/?https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
 
 const REGION_LABELS = {
   africa: "Africa",
