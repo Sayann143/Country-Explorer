@@ -5,7 +5,7 @@
    ============================================================ */
 
 // Using a highly reliable, pre-encoded CORS proxy that bypasses adblockers
-const API_URL = "https://api.allorigins.win/raw?url=https%3A%2F%2Frestcountries.com%2Fv3.1%2Fall%3Ffields%3Dname%2Cflags%2Cpopulation%2Cregion%2Ccapital%2Ccca3";
+const API_URL = "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
 
 const REGION_LABELS = {
   africa: "Africa",
