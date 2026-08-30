@@ -5,7 +5,7 @@
    ============================================================ */
 
 // Using a highly reliable, pre-encoded CORS proxy that bypasses adblockers
-const API_URL = "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
+const API_URL = "https://corsproxy.io/?https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
 
 const REGION_LABELS = {
   africa: "Africa",
