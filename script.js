@@ -4,8 +4,11 @@
    Atlas — country explorer
    ============================================================ */
 
-// Using a highly reliable, pre-encoded CORS proxy that bypasses adblockers
-const API_URL = "https://corsproxy.io/?https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
+// Calling the official API directly. If your network/region blocks this
+// (CORS/Cloudflare errors), loadCountries() below will silently fall back
+// to the hardcoded fallbackData array so the UI never breaks.
+const API_URL =
+  "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,cca3";
 
 const REGION_LABELS = {
   africa: "Africa",
@@ -15,6 +18,164 @@ const REGION_LABELS = {
   oceania: "Oceania",
   antarctic: "Antarctic",
 };
+
+// ---- Fallback dataset -----------------------------------------------
+// Used only when the live API request fails (e.g. network/CORS block).
+// Shape matches the REST Countries v3.1 "fields=name,flags,population,
+// region,capital,cca3" response exactly, so buildCard()/populateRegionOptions()
+// work unmodified against it.
+const fallbackData = [
+  {
+    name: {
+      common: "India",
+      official: "Republic of India",
+    },
+    flags: {
+      svg: "https://flagcdn.com/in.svg",
+      png: "https://flagcdn.com/w320/in.png",
+      alt: "The flag of India has three equal horizontal bands of saffron, white, and green, with a navy blue chakra centered on the white band.",
+    },
+    population: 1380004385,
+    region: "Asia",
+    capital: ["New Delhi"],
+    cca3: "IND",
+  },
+  {
+    name: {
+      common: "United States",
+      official: "United States of America",
+    },
+    flags: {
+      svg: "https://flagcdn.com/us.svg",
+      png: "https://flagcdn.com/w320/us.png",
+      alt: "The flag of the United States has thirteen horizontal stripes of red and white, with a blue canton containing fifty white stars.",
+    },
+    population: 329484123,
+    region: "Americas",
+    capital: ["Washington, D.C."],
+    cca3: "USA",
+  },
+  {
+    name: {
+      common: "Nigeria",
+      official: "Federal Republic of Nigeria",
+    },
+    flags: {
+      svg: "https://flagcdn.com/ng.svg",
+      png: "https://flagcdn.com/w320/ng.png",
+      alt: "The flag of Nigeria has three equal vertical bands of green, white, and green.",
+    },
+    population: 206139589,
+    region: "Africa",
+    capital: ["Abuja"],
+    cca3: "NGA",
+  },
+  {
+    name: {
+      common: "Germany",
+      official: "Federal Republic of Germany",
+    },
+    flags: {
+      svg: "https://flagcdn.com/de.svg",
+      png: "https://flagcdn.com/w320/de.png",
+      alt: "The flag of Germany has three equal horizontal bands of black, red, and gold.",
+    },
+    population: 83240525,
+    region: "Europe",
+    capital: ["Berlin"],
+    cca3: "DEU",
+  },
+  {
+    name: {
+      common: "Australia",
+      official: "Commonwealth of Australia",
+    },
+    flags: {
+      svg: "https://flagcdn.com/au.svg",
+      png: "https://flagcdn.com/w320/au.png",
+      alt: "The flag of Australia has a blue field with the Union Jack in the canton, a large white star below it, and the Southern Cross constellation.",
+    },
+    population: 25687041,
+    region: "Oceania",
+    capital: ["Canberra"],
+    cca3: "AUS",
+  },
+  {
+    name: {
+      common: "Brazil",
+      official: "Federative Republic of Brazil",
+    },
+    flags: {
+      svg: "https://flagcdn.com/br.svg",
+      png: "https://flagcdn.com/w320/br.png",
+      alt: "The flag of Brazil has a green field with a yellow rhombus and a blue globe bearing the national motto.",
+    },
+    population: 212559409,
+    region: "Americas",
+    capital: ["Brasília"],
+    cca3: "BRA",
+  },
+  {
+    name: {
+      common: "Japan",
+      official: "Japan",
+    },
+    flags: {
+      svg: "https://flagcdn.com/jp.svg",
+      png: "https://flagcdn.com/w320/jp.png",
+      alt: "The flag of Japan has a white field with a crimson-red disc in the center.",
+    },
+    population: 125836021,
+    region: "Asia",
+    capital: ["Tokyo"],
+    cca3: "JPN",
+  },
+  {
+    name: {
+      common: "South Africa",
+      official: "Republic of South Africa",
+    },
+    flags: {
+      svg: "https://flagcdn.com/za.svg",
+      png: "https://flagcdn.com/w320/za.png",
+      alt: "The flag of South Africa has a black, green, and gold Y-shaped band, with white-edged red and blue bands.",
+    },
+    population: 59308690,
+    region: "Africa",
+    capital: ["Pretoria", "Bloemfontein", "Cape Town"],
+    cca3: "ZAF",
+  },
+  {
+    name: {
+      common: "France",
+      official: "French Republic",
+    },
+    flags: {
+      svg: "https://flagcdn.com/fr.svg",
+      png: "https://flagcdn.com/w320/fr.png",
+      alt: "The flag of France has three equal vertical bands of blue, white, and red.",
+    },
+    population: 67391582,
+    region: "Europe",
+    capital: ["Paris"],
+    cca3: "FRA",
+  },
+  {
+    name: {
+      common: "New Zealand",
+      official: "New Zealand",
+    },
+    flags: {
+      svg: "https://flagcdn.com/nz.svg",
+      png: "https://flagcdn.com/w320/nz.png",
+      alt: "The flag of New Zealand has a blue field with the Union Jack in the canton and four red, white-edged stars representing the Southern Cross.",
+    },
+    population: 5084300,
+    region: "Oceania",
+    capital: ["Wellington"],
+    cca3: "NZL",
+  },
+];
 
 // ---- DOM references ----------------------------------------------------
 const countryCountEl = document.getElementById("countryCount");
@@ -55,7 +216,7 @@ function regionSlug(region) {
   return String(region || "").toLowerCase().trim().replace(/\s+/g, "-");
 }
 
-// ---- View state switches (Bulletproof Cache Fix) -------------
+// ---- View state switches -------------------------------------------
 
 function setBusy(isBusy) {
   resultsSection.setAttribute("aria-busy", String(isBusy));
@@ -206,6 +367,11 @@ function applyFilters() {
 
 /** Populates the region <select> from whatever regions actually exist in the data. */
 function populateRegionOptions(countries) {
+  // Reset in case this runs twice (e.g. live load, then a later fallback).
+  regionSelect.querySelectorAll("option:not([value='all'])").forEach((opt) =>
+    opt.remove()
+  );
+
   const regionsFound = new Set();
   countries.forEach((c) => {
     if (c.region) regionsFound.add(c.region);
@@ -224,6 +390,20 @@ function populateRegionOptions(countries) {
 }
 
 // ---- Data fetching -------------------------------------------------------
+
+/** Loads the bundled fallback dataset and renders it, applying current filters. */
+function loadFallbackData() {
+  console.warn(
+    "Atlas: live API request failed — using bundled fallback dataset instead."
+  );
+
+  allCountries = [...fallbackData].sort((a, b) =>
+    (a.name?.common ?? "").localeCompare(b.name?.common ?? "")
+  );
+
+  populateRegionOptions(allCountries);
+  applyFilters();
+}
 
 async function loadCountries() {
   showSkeleton();
@@ -249,12 +429,11 @@ async function loadCountries() {
     updateCount(allCountries.length);
     renderCountries(allCountries);
   } catch (err) {
-    console.error("Failed to load countries:", err);
-    const isNetworkFailure = err?.name === "TypeError";
-    const message = isNetworkFailure
-      ? "We couldn't reach the REST Countries API. Check your internet connection and try again."
-      : `${err.message || "An unexpected error occurred."} Please try again.`;
-    showError(message);
+    // Network/CORS block, timeout, bad response, etc. — don't show the
+    // error state to the user; fall back to the bundled dataset instead
+    // so the UI keeps working.
+    console.error("Failed to load live country data:", err);
+    loadFallbackData();
   }
 }
 
